@@ -1,0 +1,241 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>学习行为智能分析助手</title>
+    <link rel="stylesheet" th:href="@{bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{bootstrap/css/bootstrap-responsive.min.css}"/>
+    <link rel="stylesheet" th:href="@{css/theme.css}"/>
+    <link rel="stylesheet" th:href="@{images/icons/css/font-awesome.css}"/>
+    <link rel="stylesheet" th:href="@{http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600}"/>
+    <script th:src="@{js/websocket.js}" type="text/javascript"></script> 
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-inverse-collapse">
+                <i class="icon-reorder shaded"></i></a>
+
+            <a class="brand" href="students.html">学习行为智能分析助手 </a>
+
+            <div class="nav-collapse collapse navbar-inverse-collapse">
+                <ul class="nav pull-left">
+                    <li><a class='active' href="http://218.94.159.98:10001/students">
+                        学生分析
+                    </a></li>
+                    <li><a href="http://218.94.159.98:10001/subjectHistory">
+                        课堂状态
+                    </a></li>
+                    <li><a href="http://218.94.159.98:10001/study">
+                        自习提醒
+                    </a></li>
+                    <li><a href="http://218.94.159.98:10001/approval">
+                        请假管理
+                    </a></li>
+
+                </ul>
+
+
+                <ul class="nav pull-right">
+
+                    <li><a><span id="time_tip">早上好</span>&nbsp;<span id="teacher_name">XX</span>老师</a></li>
+                    <li class="nav-user dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="../images/user.png" class="nav-avatar"/>
+                        <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">座位表录入</a></li>
+                            <li><a href="#">学生录入</a></li>
+                            <li><a href="#">账户设置</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">登出</a></li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </div><!-- /.nav-collapse -->
+
+        </div>
+    </div>
+    <!-- /navbar-inner -->
+</div>
+<!-- /navbar -->
+<div class="wrapper">
+    <div class="container">
+        <div class="row">
+
+            <div class="span8 offset2">
+                <div class="content">
+                    <div class="module">
+                        <div class="module-head">
+                            <div class="pull-left">
+                                <a class="icon-backward  pull-left" onclick="backToIndex()"></a>
+                                <h3 style="margin-left: 30px" id="current_sname">王小明</h3>
+                            </div>
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <button class="btn" id="time_filter">今天</button>
+                                    <button class="btn dropdown-toggle" data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" id="time_list">
+                                        <li><a onclick="changeTimeBack(1)">今天</a></li>
+                                        <!--<li><a onclick="changeTimeBack(3)">最近三天</a></li>-->
+                                        <li><a onclick="changeTimeBack(7)">最近一周</a></li>
+                                        <li><a onclick="changeTimeBack(30)">最近一月</a></li>
+                                        <li class="divider"></li>
+                                        <li><a onclick="changeTimeBack(90)">本学期</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <h3>
+                                <!--使得module-head有留白-->
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div class="module message">
+                        <div class="module-head">
+                            <h3>综合分析</h3>
+                        </div>
+
+                        <div class="btn-box-row row-fluid">
+                            <div class="span5" style="height:250px" id="general_analyze">
+
+                            </div>
+                            <div class="span7" id="problem_analyze">
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="module-foot">
+                        </div>
+                    </div>
+
+
+                    <div class="module message">
+                        <div class="module-head">
+                            <h3>出勤表现</h3>
+                        </div>
+                        <div class="module-option clearfix">
+                            <div class="pull-left">
+                                &nbsp;出勤率为&nbsp;<a id="attendance_percent">25%</a>
+                            </div>
+                            <!--<div class="pull-right">-->
+                            <!--<a href="#" class="btn btn-primary">详细信息</a>-->
+                            <!--</div>-->
+                        </div>
+                        <div class="module-body table">
+
+                            <table class="table table-message">
+                                <tbody id="attencen_list">
+
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                        <div class="module-foot">
+                        </div>
+                    </div>
+
+
+                    <div class="module">
+                        <div class="module-head">
+                            <h3>
+                                课堂表现</h3>
+                        </div>
+                        <div class="module-option clearfix">
+                            <div class="pull-left">
+
+
+                                <div class="btn-group">
+                                    <button class="btn" id="subject_filter">全部</button>
+                                    <button class="btn dropdown-toggle" data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a onclick="getLessonALL()">全部</a></li>
+                                        <li><a onclick="getLesson('语文')">语文</a></li>
+                                        <li><a onclick="getLesson('数学')">数学</a></li>
+                                        <li><a onclick="getLesson('英语')">英语</a></li>
+                                        <li class="divider"></li>
+                                        <li><a onclick="getLesson('品德')">品德</a></li>
+                                        <li><a onclick="getLesson('科学')">科学</a></li>
+                                    </ul>
+                                </div>
+                                &nbsp;课堂表现优于<a id="lesson_percent">73%</a>的同学 &nbsp;
+                            </div>
+                        </div>
+                        <div class="module-body">
+                            <div id="lesson_show" style="width:720px;height:400px;"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="module message">
+                        <div class="module-head">
+                            <h3>自习表现</h3>
+                        </div>
+                        <div class="module-option clearfix">
+                            <div class="pull-left">
+                                &nbsp;自习表现为&nbsp;<a id="dicipline_percent"></a>
+                            </div>
+
+                            <!--<div class="pull-right">-->
+                            <!--<a href="#" class="btn btn-primary">详细信息</a>-->
+                            <!--</div>-->
+                        </div>
+                        <div class="module-body table">
+
+                            <table class="table table-message">
+                                <tbody id="dicipline_list">
+
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                        <div class="module-foot">
+                        </div>
+                    </div>
+
+                    <!--/.module-->
+                </div>
+                <!--/.content-->
+            </div>
+            <!--/.span9-->
+
+        </div>
+    </div>
+    <!--/.container-->
+</div>
+<!--/.wrapper-->
+<div class="footer">
+    <!--<div class="container">-->
+    <!--<b class="copyright">&copy; 2017 EGrappler </b>All rights reserved.-->
+    <!--</div>-->
+</div>
+
+
+<script th:src="@{scripts/jquery-1.9.1.min.js}"></script>
+<script th:src="@{scripts/jquery-ui-1.10.1.custom.min.js}"></script>
+<script th:src="@{bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{js/ref/jquerysession.js}"></script>
+<script th:src="@{scripts/flot/jquery.flot.js}"></script>
+<script th:src="@{scripts/echarts.common.min.js}"></script>
+<script th:src="@{scripts/echarts.min.js}"></script>
+<script th:src="@{scripts/datatables/jquery.dataTables.js}"></script>
+<script th:src="@{scripts/js/util.js}"></script>
+<script th:src="@{scripts/js/detail.js}"></script>
+<script>
+    function backToIndex() {
+        window.location.href = "http://218.94.159.98:10001/students";
+    }
+</script>
+
+</body>
+</html>

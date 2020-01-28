@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <link th:href="@{css/theme.css}" rel="stylesheet" />
+  <title>报警窗口</title>
+</head>
+<body style="margin: 0px;">
+ 
+<div  class="layui-container">
+
+<div  id="alarm_vedio"  width="100%" style="margin:0px 10px 0px 10px">
+
+<video id="video"  width="100%" height="100%" autoplay="" src="../video/alarm1.mp4"  type="video/mp4" controller="controller" >您的浏览器不支持该视频格式。</video>
+</div>
+
+<div style = "text-align:right; margin:15px 0px 0px 0px">
+  <button class="btn btn-primary" style="margin:0px 10px;" onclick="dismiss()">&nbsp;&nbsp;误报&nbsp;&nbsp;</button>
+  <button class="btn btn-primary" style="margin:0px 10px;" onclick="confirm()">&nbsp;&nbsp;确定&nbsp;&nbsp;</button>
+</div>
+
+</div>
+
+<script th:src="@{scripts/jquery-1.9.1.min.js}" type="text/javascript"></script>
+<script th:src="@{js/layer/layer.js}"></script>
+<script>
+window.onload=function (){
+	var src = window.location.href; 
+	window.id =  parseInt(src.substr(src.indexOf("?alarm=") + 7));
+	//alert("alarm_id:"+ window.id);
+	$.ajax({
+        url: 'http://218.94.159.98:10002/study/get_s_alarm',
+        //dataType: 'String',
+        type: 'POST',
+        data: {'alarm_id': window.id },
+        async: false,
+        success: function (obj) {
+        	//obj["vedio_path"]
+        	var latency=parseInt(obj["start"]);
+        	var path=obj["vedio_path"];
+        	var video='<video id="video" width="100%" height="100%" autoplay="" src="'+path+'"  type="video/mp4" controls="controls" >您的浏览器不支持该视频格式。</video>'
+        	document.getElementById("alarm_vedio").innerHTML =video;
+        	document.getElementById("video").currentTime =latency;
+        	document.getElementById("video").play();
+        }
+});
+}
+
+function getVideoPath(){
+	document.getElementById('alarm_vedio').src = "../video/alarm1.mp4";
+	
+}
+
+function confirm(){
+	handle(1);
+}
+
+function dismiss(){
+	handle(2);
+}
+
+function handle(handle_id){
+	$.ajax({
+        url: 'http://218.94.159.98:10002/study/alarmhandle',
+        type: 'POST',
+        data: {'alarm_id': window.id, 'h_type': handle_id,'handle':''},
+        async: false,
+        success: function (obj) {
+        	var index = parent.layer.getFrameIndex(window.name);
+        	parent.layer.close(index);
+        	parent.layer.msg(obj,{
+        	    time: 20000, //20s后自动关闭
+        	  });
+        	parent.location.reload();
+           },
+        error: function(){
+        	var index = parent.layer.getFrameIndex(window.name);
+        	parent.layer.close(index);
+        	parent.layer.msg("操作失败",{
+        	    time: 20000, //20s后自动关闭
+        	  });
+        	parent.location.reload();
+            }
+    });
+}
+
+</script>
+</body>
+</html>        
+        

@@ -1,0 +1,6 @@
+classmonitor/.idea/*
+classmonitor/.classpath
+classmonitor/.project
+*.iml
+classmonitor/.settings
+*.class
